@@ -5,8 +5,8 @@
     
     <entry>
       <title>Docker保存</title>
-      <link href="/2020/01/21/Docker%E4%BF%9D%E5%AD%98/"/>
-      <url>/2020/01/21/Docker%E4%BF%9D%E5%AD%98/</url>
+      <link href="/2020/Docker%E4%BF%9D%E5%AD%98/"/>
+      <url>/2020/Docker%E4%BF%9D%E5%AD%98/</url>
       
         <content type="html"><![CDATA[<html><head></head><body><h3 id="Docker-save-amp-docker-load"><a href="#Docker-save-amp-docker-load" class="headerlink" title="Docker save & docker load"></a>Docker save & docker load</h3><ul><li>docker save -o [xxx.tar] [imageid]</li><li>使用对象是镜像，将镜像打包成文件</li><li>不会丢失历史和层，可以进行层回滚</li><li>可以理解为保存所有数据</li></ul><h3 id="Docker-export-amp-docker-import"><a href="#Docker-export-amp-docker-import" class="headerlink" title="Docker export & docker import"></a>Docker export & docker import</h3><ul><li>docker export [containerid][xxx.tar]</li><li>使用对象是容器，可以直接将容器打包成文件</li><li>会丢失所有历史</li><li>可以理解为导出容器的当前状态为文件</li></ul><h3 id="Docker-commit"><a href="#Docker-commit" class="headerlink" title="Docker commit"></a>Docker commit</h3><ul><li>docker commit -a “tangyuan” -m “xxx(备注)” [containerid] [name:tag]</li><li>将容器保存成镜像</li><li>会在原层数上新增一层，最新一层对应从镜像运行到commit之前对文件系统的更改，但有状态的服务无法保存</li></ul><h3 id="常见使用方式"><a href="#常见使用方式" class="headerlink" title="常见使用方式"></a>常见使用方式</h3><ul><li>一般情况下若是打包分享，直接export比较简单，文件也比较小</li><li>如果需要回滚，commit+save</li></ul></body></html>]]></content>
       
@@ -24,8 +24,8 @@
     
     <entry>
       <title>Docker原理及文件系统</title>
-      <link href="/2020/01/21/Docker%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/"/>
-      <url>/2020/01/21/Docker%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/</url>
+      <link href="/2020/Docker%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/"/>
+      <url>/2020/Docker%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/</url>
       
         <content type="html"><![CDATA[<html><head></head><body><h3 id="Docker原理"><a href="#Docker原理" class="headerlink" title="Docker原理"></a>Docker原理</h3><ol><li>docker利用Linux的核心分离机制<ul><li>利用Namespace做资源隔离（使进程貌似拥有独立的操作系统环境）</li><li>利用Cgroup做资源限制（限制一个进程组能够使用的资源上限）</li><li>利用Union FS做容器文件系统的轻量级虚拟化技术（联合文件系统） </li></ul></li><li>其他使用的技术<ul><li>AUFS（chroot）建立不同Container的档案系统</li><li>SELinux 确保Container的网络安全</li><li>Netlink、Netfilter、Apparmor、Linux Bridge等</li></ul></li><li>Docker架构<ul><li>Docker client 呼叫Docker Daemon</li><li>Docker daemon 执行Docker功能</li><li>libcontainer 和linux核心交流的library</li><li>docker image 建立容器用的镜像</li><li>docker client 呼叫 docker daemon，然后docker daemon通过libcontainer 呼叫linux的核心组件建立容器 </li></ul></li><li>docker VS 虚拟机<ul><li>虚拟机有一层硬件虚拟机，上面安装新的操作系统</li><li>docker容器是由docker deamon拉起的一个个进程，本质上就是一个运行在宿主机上面的进程</li><li>虚拟机的性能损耗较大，docker的安全性较差</li><li>无法在windows上运行linux容器，如果容器内的应用对特定系统内核有要求也不能运行在不满足要求的宿主机上面</li></ul></li></ol><h3 id="Docker文件系统"><a href="#Docker文件系统" class="headerlink" title="Docker文件系统"></a>Docker文件系统</h3><ol><li>docker容器文件系统是分层化的，最上面一层可读写，里面层都只读。 </li><li>查找文件时会一层一层向下寻找，直到找到。</li><li>用户面向的是叠加的文件系统（联合文件系统），联合文件系统用到了一个重要的资源管理技术，叫写时复制，也叫隐式共享，对于一个重复资源，修改时才会创建新资源。</li><li>任何对于文件的操作都会记录在容器层（最上面的读写层）<ul><li>修改文件：容器层会把在镜像层找到的文件拷贝到容器层，再进行修改。镜像层的只读版本仍然存在，但会被容器层的副本所隐藏</li><li>删除文件：会在容器层内记录删除文件的记录</li></ul></li></ol></body></html>]]></content>
       
